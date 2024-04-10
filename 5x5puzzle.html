@@ -110,7 +110,6 @@
 <div class="puzzle-container" id="puzzleContainer"></div>
 <div class="button-container">
   <button class="button" onclick="shuffleTiles()">Shuffle</button>
-  <a href="#" class="button" onclick="returnToMenu()">Return to Menu</a>
 </div>
 <div class="button-container">
   <a href="6x6puzzle.html" class="button">Go to next puzzle</a>
@@ -176,12 +175,6 @@
       const seconds = elapsedSeconds % 60;
       timerElement.textContent = `Time: ${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
     }, 1000);
-  }
-
-  function returnToMenu() {
-    // Add your code here to handle returning to the menu
-    alert("Returning to menu...");
-    return false; // Prevent default link behavior
   }
 
   renderTiles();
