@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Puzzle Game</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f2f2f2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column; /* Align items vertically */
+    height: 100vh;
+    margin: 0;
+    position: relative;
+  }
+
+  .puzzle-container {
+    width: 600px; /* Adjusted for 6x6 puzzle */
+    height: 600px; /* Adjusted for 6x6 puzzle */
+    border: 5px solid #333;
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex;
+    flex-wrap: wrap;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    background: #f9f9f9;
+    position: relative;
+  }
+
+  .tile {
+    width: 98px; /* Adjusted for 6x6 puzzle */
+    height: 98px; /* Adjusted for 6x6 puzzle */
+    border: 1px solid #ccc;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    background: linear-gradient(45deg, #e6e6e6, #ffffff);
+  }
+
+  .tile:hover {
+    transform: scale(1.05);
+    background: linear-gradient(45deg, #ffffff, #e6e6e6);
+  }
+
+  .tile:nth-child(odd) {
+    background: linear-gradient(45deg, #f0f0f0, #ffffff);
+  }
+
+  .tile:nth-child(odd):hover {
+    background: linear-gradient(45deg, #ffffff, #f0f0f0);
+  }
+
+  .button-container {
+    text-align: center;
+    margin-top: 20px;
+  }
+
+  .button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #4caf50;
+    border: none;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-bottom: 10px;
+  }
+
+  .button:hover {
+    background-color: #45a049;
+  }
+
+  .timer {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 18px;
+  }
+
+  .note {
+    position: absolute;
+    top: 50px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 14px;
+    color: #777;
+    text-align: center;
+  }
+
+  .copyright {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 12px;
+    color: #777;
+  }
+</style>
+</head>
+<body>
+<div class="note">You need to click the shuffle button to start the timer.</div>
+<div class="timer" id="timer">Time: 00:00</div>
+<div class="puzzle-container" id="puzzleContainer"></div>
+<div class="button-container">
+  <button class="button" onclick="shuffleTiles()">Shuffle</button>
+  <a href="index.html" class="button">Go to 5x5 puzzle</a>
+</div>
+<div class="copyright">© 2024 Teknik AB Games</div>
+
+<script>
+  const initialTiles = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, null];
+  let tiles = [...initialTiles];
+  let startTime;
+
+  function shuffleTiles() {
+    for (let i = tiles.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [tiles[i], tiles[j]] = [tiles[j], tiles[i]];
+    }
+    renderTiles();
+    startTime = Date.now();
+    updateTimer();
+  }
+
+  function isSolved() {
+    return tiles.every((tile, index) => tile === null || tile === index + 1);
+  }
+
+  function tileClickHandler(index) {
+    if (tiles[index] === null) return;
+
+    const nullIndex = tiles.indexOf(null);
+    const rowDiff = Math.abs(Math.floor(index / 6) - Math.floor(nullIndex / 6));
+    const colDiff = Math.abs(index % 6 - nullIndex % 6);
+
+    if ((rowDiff === 1 && colDiff === 0) || (rowDiff === 0 && colDiff === 1)) {
+      [tiles[index], tiles[nullIndex]] = [tiles[nullIndex], tiles[index]];
+      renderTiles();
+      if (isSolved()) {
+        const endTime = Date.now();
+        const timeTaken = (endTime - startTime) / 1000;
+        alert(`Congratulations! You solved the puzzle in ${timeTaken.toFixed(1)} seconds.`);
+      }
+    }
+  }
+
+  function renderTiles() {
+    const container = document.getElementById('puzzleContainer');
+    container.innerHTML = '';
+
+    tiles.forEach((tile, index) => {
+      const tileElement = document.createElement('div');
+      tileElement.classList.add('tile');
+      tileElement.innerText = tile !== null ? tile : '';
+      tileElement.addEventListener('click', () => tileClickHandler(index));
+      container.appendChild(tileElement);
+    });
+  }
+
+  function updateTimer() {
+    const timerElement = document.getElementById('timer');
+    let elapsedSeconds = 0;
+    setInterval(() => {
+      elapsedSeconds = Math.floor((Date.now() - startTime) / 1000);
+      const minutes = Math.floor(elapsedSeconds / 60);
+      const seconds = elapsedSeconds % 60;
+      timerElement.textContent = `Time: ${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+    }, 1000);
+  }
+
+  renderTiles();
+</script>
+</body>
+</html>
